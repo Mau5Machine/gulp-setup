@@ -5,15 +5,41 @@ const gulp = require('gulp');
 const sass = require('gulp-sass');
 // require gulp image min
 const imagemin = require('gulp-imagemin');
+// require gulp uglify js
+const uglify = require('gulp-uglify');
+// require pump
+var pump = require('pump');
+// require gulp uglify css
+var uglifycss = require('gulp-uglifycss');
 
 // require sass compiler with node
 sass.compiler = require('node-sass');
 
 // set the sass task in gulp
-gulp.task('sass', function () {
+gulp.task('sass', () => {
     return gulp.src('styles/scss/*.scss')
         .pipe(sass().on('error', sass.logError))
         .pipe(gulp.dest('styles/css/'));
+});
+
+// uglify css task
+gulp.task('css', () =>
+    gulp.src(['css/hover.css', 'css/morphext.css'])
+    .pipe(uglifycss({
+        "uglyComments": true
+    }))
+    .pipe(gulp.dest('dist'))
+);
+
+// task for uglify js
+gulp.task('compress', (cb) => {
+    pump([
+            gulp.src('css/styles.css'),
+            uglify(),
+            gulp.dest('dist')
+        ],
+        cb
+    );
 });
 
 // set the task for imagemin
